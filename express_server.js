@@ -49,6 +49,11 @@ app.post('/login', (req, res) => {
   res.redirect('/urls')
 })
 
+app.post('/logout', (req, res) => {
+  res.clearCookie("username")
+  res.redirect('/urls')
+})
+
 app.post('/urls/:id/delete', (req, res) => {
   const userInput = req.params.id;
   delete urlDatabase[userInput]
