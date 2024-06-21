@@ -49,6 +49,10 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
+  console.log(generateRandomString())
+  // console.log(urlDatabase)
+  urlDatabase[generateRandomString()] = req.body.longURL
+  console.log(urlDatabase)
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
