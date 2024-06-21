@@ -20,6 +20,15 @@
         <p class="card-text">
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
+        <section>
+          <form action="/urls/<%= id %>/edit" method="POST">
+            <div>
+              <label for="main">New URL:</label>
+              <input type="text" name="main">
+              <button type="submit">Submit</button>
+            </div>
+          </form>
+        </section>
       </div>
       <div class="card-footer text-muted"></div>
     </div>

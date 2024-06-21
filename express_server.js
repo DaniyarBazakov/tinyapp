@@ -48,6 +48,13 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/')
 })
 
+app.post('/urls/:id/edit', (req, res) => {
+  const userInput = req.params.id;
+  const newItems = req.body.main;
+  urlDatabase[userInput] = newItems;
+  res.redirect('/')
+})
+
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render("urls_show", templateVars);
