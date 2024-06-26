@@ -23,6 +23,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -70,6 +83,7 @@ app.post('/urls/:id/edit', (req, res) => {
   const userInput = req.params.id;
   const newItems = req.body.main;
   urlDatabase[userInput] = newItems;
+  res.cookie("username", req.body.username)
   res.redirect('/')
 })
 
@@ -82,6 +96,19 @@ app.post("/urls", (req, res) => {
   const newRandom = generateRandomString();
   urlDatabase[newRandom] = req.body.longURL;
   res.redirect(`/urls/${newRandom}`);
+});
+
+app.post("/register", (req, res) => {
+  const newRandom = generateRandomString();
+  const email = req.body.email
+  const password = req.body.password
+  users[newRandom] = {
+    id: newRandom,
+    email: email,
+    password: password
+  }
+  res.cookie("user_id ", newRandom)
+  res.redirect(`/register`);
 });
 
 app.get("/u/:id", (req, res) => {
