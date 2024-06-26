@@ -18,6 +18,15 @@ function generateRandomString() {
     return result;
 }
 
+function getUserByEmail(account) {
+  for (let userId in users) {
+    if (users[userId].email === account) {
+      return users[userId]; 
+    }
+  }
+  return null; 
+}
+
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
@@ -115,13 +124,19 @@ app.post("/register", (req, res) => {
   const newRandom = generateRandomString();
   const email = req.body.email
   const password = req.body.password
-  users[newRandom] = {
-    id: newRandom,
-    email: email,
-    password: password
+  if (email === "" || password === "") {
+    res.status(400).send('Email and Password can not be empty');
+  } else if (getUserByEmail(email) !== null) {
+    res.status(400).send('This email us currently used');
+  } else {
+    users[newRandom] = {
+      id: newRandom,
+      email: email,
+      password: password
+    }
+    res.cookie("user_id ", newRandom)
+    res.redirect(`/urls`);
   }
-  res.cookie("user_id ", newRandom)
-  res.redirect(`/urls`);
 });
 
 app.get("/u/:id", (req, res) => {
