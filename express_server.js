@@ -101,7 +101,6 @@ app.post('/urls/:id/edit', (req, res) => {
   const userInput = req.params.id;
   const newItems = req.body.main;
   urlDatabase[userInput] = newItems;
-  res.cookie("username", req.body.username)
   res.redirect('/')
 })
 
@@ -122,8 +121,8 @@ app.post("/urls", (req, res) => {
 
 app.post("/register", (req, res) => {
   const newRandom = generateRandomString();
-  const email = req.body.email
-  const password = req.body.password
+  const email = req.body.email.trim()
+  const password = req.body.password.trim()
   if (email === "" || password === "") {
     res.status(400).send('Email and Password can not be empty');
   } else if (getUserByEmail(email) !== null) {
