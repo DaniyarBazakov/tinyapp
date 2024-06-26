@@ -17,9 +17,9 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-      <% if(username){ %>
+      <% if(user){ %>
           <form method="POST" action="/logout" class="ml-auto">
-            <h class="card-title">Logged in as: <%= username %></h>
+            <h class="card-title">Logged in as: <%= user.email %></h>
             <button type="submit">Log Out</button>
           </form>
         <% } else{ %>
