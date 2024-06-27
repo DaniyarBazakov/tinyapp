@@ -72,6 +72,12 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 
+app.get("/login", (req, res) => {
+  const templateVars = { urls: urlDatabase, user: null };
+  res.clearCookie("user_id")
+  res.render("login", templateVars);
+});
+
 app.get("/urls/new", (req, res) => {
   const {user_id} = req.cookies
   if (!users[user_id]) {
