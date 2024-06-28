@@ -28,15 +28,38 @@ function getUserByEmail(account) {
   return null; 
 }
 
-//verify if id exist in object urlDatabase
-function getUrlById(urlID) {
-  urls = Object.keys(urlDatabase)
+// //verify if id exist in object urlDatabase
+// function getUrlById(urlID) {
+//   urls = Object.keys(urlDatabase)
+//   for (const item of urls) {
+//     if (item === urlID) {
+//       return urlDatabase[item];
+//     }
+//   }
+//   return null; 
+// }
+
+//verify if a user own url
+function getUrlById(urlID, obj) {
+  urls = Object.keys(obj)
   for (const item of urls) {
     if (item === urlID) {
-      return urlDatabase[item];
+      return obj[item];
     }
   }
   return null; 
+}
+
+//retreive urls only for this user id
+//write a function that will return an object with object
+function urlsForUser(id) {
+  const userUrls = {};
+  for (const key in urlDatabase) {
+    if (urlDatabase[key].userID === id) {
+      userUrls[key] = urlDatabase[key];
+    }
+  }
+  return userUrls;
 }
 
 // const urlDatabase = {
@@ -51,7 +74,11 @@ const urlDatabase = {
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
-    userID: "aJ48lW",
+    userID: "byee11",
+  },
+  efas: {
+    longURL: "https://www.no.ca",
+    userID: "byee11",
   },
 };
 
@@ -66,8 +93,8 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk",
   },
-  user1: {
-    id: "user1",
+  byee11: {
+    id: "byee11",
     email: "bazakovd@gmail.com",
     password: "yy",
   },
@@ -88,9 +115,12 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   const {user_id} = req.cookies
   if (!users[user_id]) {
-    return res.redirect("/login")
+    // return res.redirect("/login")
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>Please Login In</h2>'));
   }
-  const templateVars = { urls: urlDatabase, user: users[user_id] };
+  // const templateVars = { urls: urlDatabase, user: users[user_id] };
+  const templateVars = { urls: urlsForUser(user_id), user: users[user_id] };
   res.render("urls_index", templateVars);
 });
 
@@ -117,7 +147,9 @@ app.get("/login", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const {user_id} = req.cookies
   if (!users[user_id]) {
-    return res.redirect("/login")
+    // return res.redirect("/login")
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>Please Login In</h2>'));
   }
   const templateVars = { urls: urlDatabase, user: users[user_id]};
   res.render("urls_new", templateVars);
@@ -130,7 +162,22 @@ app.post('/logout', (req, res) => {
 
 app.post('/urls/:id/delete', (req, res) => {
   const userInput = req.params.id;
-  console.log(userInput)
+  const {user_id} = req.cookies
+  if (!users[user_id]) {
+    // return res.redirect("/login")
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>Please Login In</h2>'));
+  }
+  //url for this id does not exist
+  if (getUrlById(req.params.id, urlDatabase) === null) {
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>ID does not exist</h2>'));
+  }
+  //user does not own this url
+  if (getUrlById(req.params.id, urlsForUser(user_id)) === null) {
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>You do not own this URL</h2>'));
+  }
   delete urlDatabase[userInput]
   res.redirect('/')
 })
@@ -138,6 +185,22 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post('/urls/:id/edit', (req, res) => {
   const userInput = req.params.id;
   const newItems = req.body.main;
+  const {user_id} = req.cookies
+  if (!users[user_id]) {
+    // return res.redirect("/login")
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>Please Login In</h2>'));
+  }
+  //url for this id does not exist
+  if (getUrlById(req.params.id, urlDatabase) === null) {
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>ID does not exist</h2>'));
+  }
+  //user does not own this url
+  if (getUrlById(req.params.id, urlsForUser(user_id)) === null) {
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>You do not own this URL</h2>'));
+  }
   urlDatabase[userInput]["longURL"] = newItems;
   res.redirect('/')
 })
@@ -145,11 +208,19 @@ app.post('/urls/:id/edit', (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const {user_id} = req.cookies
   if (!users[user_id]) {
-    return res.redirect("/login")
+    // return res.redirect("/login")
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>Please Login In</h2>'));
   }
-  if (getUrlById(req.params.id) === null) {
+  //url for this id does not exist
+  if (getUrlById(req.params.id, urlDatabase) === null) {
     res.set('Content-Type', 'text/html');
     return res.send(Buffer.from('<h2>ID does not exist</h2>'));
+  }
+  //user does not own this url
+  if (getUrlById(req.params.id, urlsForUser(user_id)) === null) {
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>You do not own this URL</h2>'));
   }
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]["longURL"], user: users[user_id]};
   res.render("urls_show", templateVars);
