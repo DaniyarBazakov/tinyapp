@@ -3,7 +3,14 @@ const cookieParser = require('cookie-parser')
 const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = 8080; 
-app.use(cookieParser())
+const cookieSession = require('cookie-session')
+// app.use(cookieParser())
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ["Cookie"],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 app.set("view engine", "ejs");
 
@@ -93,7 +100,8 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const {user_id} = req.cookies
+  // const {user_id} = req.cookies
+  const {user_id} = req.session
   if (!users[user_id]) {
     // return res.redirect("/login")
     res.set('Content-Type', 'text/html');
@@ -105,27 +113,32 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const {user_id} = req.cookies
+  // const {user_id} = req.cookies
+  const {user_id} = req.session
   if (users[user_id]) {
     return res.redirect("/urls")
   }
   const templateVars = { urls: urlDatabase, user: null };
-  res.clearCookie("user_id")
+  // res.clearCookie("user_id")
+  req.session = null
   res.render("register", templateVars);
 });
 
 app.get("/login", (req, res) => {
-  const {user_id} = req.cookies
+  // const {user_id} = req.cookies
+  const {user_id} = req.session
   if (users[user_id]) {
     return res.redirect("/urls")
   }
   const templateVars = { urls: urlDatabase, user: null };
-  res.clearCookie("user_id")
+  // res.clearCookie("user_id")
+  req.session = null
   res.render("login", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const {user_id} = req.cookies
+  // const {user_id} = req.cookies
+  const {user_id} = req.session
   if (!users[user_id]) {
     // return res.redirect("/login")
     res.set('Content-Type', 'text/html');
@@ -136,13 +149,15 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie("user_id")
+  // res.clearCookie("user_id")
+  req.session = null
   res.redirect('/login')
 })
 
 app.post('/urls/:id/delete', (req, res) => {
   const userInput = req.params.id;
-  const {user_id} = req.cookies
+  // const {user_id} = req.cookies
+  const {user_id} = req.session
   if (!users[user_id]) {
     // return res.redirect("/login")
     res.set('Content-Type', 'text/html');
@@ -165,7 +180,8 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post('/urls/:id/edit', (req, res) => {
   const userInput = req.params.id;
   const newItems = req.body.main;
-  const {user_id} = req.cookies
+  // const {user_id} = req.cookies
+  const {user_id} = req.session
   if (!users[user_id]) {
     // return res.redirect("/login")
     res.set('Content-Type', 'text/html');
@@ -186,7 +202,8 @@ app.post('/urls/:id/edit', (req, res) => {
 })
 
 app.get("/urls/:id", (req, res) => {
-  const {user_id} = req.cookies
+  // const {user_id} = req.cookies
+  const {user_id} = req.session
   if (!users[user_id]) {
     // return res.redirect("/login")
     res.set('Content-Type', 'text/html');
@@ -207,7 +224,8 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const {user_id} = req.cookies
+  // const {user_id} = req.cookies
+  const {user_id} = req.session
   if (!users[user_id]) {
     //return hmtl message
     res.set('Content-Type', 'text/html');
@@ -238,7 +256,8 @@ app.post('/login', (req, res) => {
     if (!bcrypt.compareSync(password, profile.password)) {
       res.status(403).send('Wrong Password')
     } else {
-      res.cookie("user_id ", profile.id)
+      // res.cookie("user_id ", profile.id)
+      req.session.user_id = profile.id;
       res.redirect(`/urls`);
     }
   }
@@ -262,7 +281,8 @@ app.post("/register", (req, res) => {
       password: hashedPassword
     }
     console.log(users)
-    res.cookie("user_id ", newRandom)
+    // res.cookie("user_id ", newRandom)
+    req.session.user_id = newRandom;
     res.redirect(`/urls`);
   }
 });
