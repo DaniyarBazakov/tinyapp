@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require('cookie-parser')
+const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = 8080; 
 app.use(cookieParser())
@@ -76,11 +77,6 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk",
-  },
-  byee11: {
-    id: "byee11",
-    email: "bazakovd@gmail.com",
-    password: "yy",
   },
 };
 
@@ -238,7 +234,8 @@ app.post('/login', (req, res) => {
   } else {
     //User exist
     // check if password matches
-    if (password !== profile.password) {
+    // if (password !== profile.password) {
+    if (!bcrypt.compareSync(password, profile.password)) {
       res.status(403).send('Wrong Password')
     } else {
       res.cookie("user_id ", profile.id)
@@ -251,6 +248,7 @@ app.post("/register", (req, res) => {
   const newRandom = generateRandomString();
   const email = req.body.email.trim()
   const password = req.body.password.trim()
+  const hashedPassword = bcrypt.hashSync(password, 10);
   //if email or password empty
   if (email === "" || password === "") {
     res.status(400).send('Email and Password can not be empty');
@@ -261,8 +259,9 @@ app.post("/register", (req, res) => {
     users[newRandom] = {
       id: newRandom,
       email: email,
-      password: password
+      password: hashedPassword
     }
+    console.log(users)
     res.cookie("user_id ", newRandom)
     res.redirect(`/urls`);
   }
