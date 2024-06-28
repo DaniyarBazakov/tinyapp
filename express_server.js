@@ -28,17 +28,6 @@ function getUserByEmail(account) {
   return null; 
 }
 
-// //verify if id exist in object urlDatabase
-// function getUrlById(urlID) {
-//   urls = Object.keys(urlDatabase)
-//   for (const item of urls) {
-//     if (item === urlID) {
-//       return urlDatabase[item];
-//     }
-//   }
-//   return null; 
-// }
-
 //verify if a user own url
 function getUrlById(urlID, obj) {
   urls = Object.keys(obj)
@@ -61,11 +50,6 @@ function urlsForUser(id) {
   }
   return userUrls;
 }
-
-// const urlDatabase = {
-//   b2xVn2: "http://www.lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com",
-// };
 
 const urlDatabase = {
   b6UTxQ: {
