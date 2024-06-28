@@ -60,7 +60,7 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   const {user_id} = req.cookies
   if (!users[user_id]) {
-    return res.redirect("/register")
+    return res.redirect("/login")
   }
   const templateVars = { urls: urlDatabase, user: users[user_id] };
   res.render("urls_index", templateVars);
@@ -87,14 +87,9 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.post('/login', (req, res) => {
-  res.cookie("username", req.body.username)
-  res.redirect('/urls')
-})
-
 app.post('/logout', (req, res) => {
   res.clearCookie("user_id")
-  res.redirect('/urls')
+  res.redirect('/login')
 })
 
 app.post('/urls/:id/delete', (req, res) => {
@@ -124,6 +119,26 @@ app.post("/urls", (req, res) => {
   urlDatabase[newRandom] = req.body.longURL;
   res.redirect(`/urls/${newRandom}`);
 });
+
+app.post('/login', (req, res) => {
+  const email = req.body.email.trim()
+  const password = req.body.password.trim()
+  const profile = getUserByEmail(email)
+  if (email === "" || password === "") {
+    res.status(400).send('Email and Password can not be empty');
+  } else if (profile === null) {
+    res.status(403).send('Email cannot be found');
+  } else {
+    //User exist
+    // check if password matches
+    if (password !== profile.password) {
+      res.status(403).send('Wrong Password')
+    } else {
+      res.cookie("user_id ", profile.id)
+      res.redirect(`/urls`);
+    }
+  }
+})
 
 app.post("/register", (req, res) => {
   const newRandom = generateRandomString();
