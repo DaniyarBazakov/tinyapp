@@ -39,9 +39,20 @@ function getUrlById(urlID) {
   return null; 
 }
 
+// const urlDatabase = {
+//   b2xVn2: "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com",
+// };
+
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 const users = {
@@ -119,6 +130,7 @@ app.post('/logout', (req, res) => {
 
 app.post('/urls/:id/delete', (req, res) => {
   const userInput = req.params.id;
+  console.log(userInput)
   delete urlDatabase[userInput]
   res.redirect('/')
 })
@@ -126,7 +138,7 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post('/urls/:id/edit', (req, res) => {
   const userInput = req.params.id;
   const newItems = req.body.main;
-  urlDatabase[userInput] = newItems;
+  urlDatabase[userInput]["longURL"] = newItems;
   res.redirect('/')
 })
 
@@ -139,7 +151,7 @@ app.get("/urls/:id", (req, res) => {
     res.set('Content-Type', 'text/html');
     return res.send(Buffer.from('<h2>ID does not exist</h2>'));
   }
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], user: users[user_id]};
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]["longURL"], user: users[user_id]};
   res.render("urls_show", templateVars);
 });
 
@@ -151,7 +163,10 @@ app.post("/urls", (req, res) => {
     return res.send(Buffer.from('<h2>User not Logged In</h2>'));
   }
   const newRandom = generateRandomString();
-  urlDatabase[newRandom] = req.body.longURL;
+  urlDatabase[newRandom] = {
+    longURL: req.body.longURL,
+    userID: user_id
+  };
   res.redirect(`/urls/${newRandom}`);
 });
 
