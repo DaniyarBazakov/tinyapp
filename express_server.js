@@ -28,6 +28,17 @@ function getUserByEmail(account) {
   return null; 
 }
 
+//verify if id exist in object urlDatabase
+function getUrlById(urlID) {
+  urls = Object.keys(urlDatabase)
+  for (const item of urls) {
+    if (item === urlID) {
+      return urlDatabase[item];
+    }
+  }
+  return null; 
+}
+
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
@@ -43,6 +54,11 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk",
+  },
+  user1: {
+    id: "user1",
+    email: "bazakovd@gmail.com",
+    password: "yy",
   },
 };
 
@@ -68,12 +84,20 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  const {user_id} = req.cookies
+  if (users[user_id]) {
+    return res.redirect("/urls")
+  }
   const templateVars = { urls: urlDatabase, user: null };
   res.clearCookie("user_id")
   res.render("register", templateVars);
 });
 
 app.get("/login", (req, res) => {
+  const {user_id} = req.cookies
+  if (users[user_id]) {
+    return res.redirect("/urls")
+  }
   const templateVars = { urls: urlDatabase, user: null };
   res.clearCookie("user_id")
   res.render("login", templateVars);
@@ -82,7 +106,7 @@ app.get("/login", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const {user_id} = req.cookies
   if (!users[user_id]) {
-    return res.redirect("/register")
+    return res.redirect("/login")
   }
   const templateVars = { urls: urlDatabase, user: users[user_id]};
   res.render("urls_new", templateVars);
@@ -109,13 +133,23 @@ app.post('/urls/:id/edit', (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const {user_id} = req.cookies
   if (!users[user_id]) {
-    return res.redirect("/register")
+    return res.redirect("/login")
+  }
+  if (getUrlById(req.params.id) === null) {
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>ID does not exist</h2>'));
   }
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], user: users[user_id]};
   res.render("urls_show", templateVars);
 });
 
 app.post("/urls", (req, res) => {
+  const {user_id} = req.cookies
+  if (!users[user_id]) {
+    //return hmtl message
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from('<h2>User not Logged In</h2>'));
+  }
   const newRandom = generateRandomString();
   urlDatabase[newRandom] = req.body.longURL;
   res.redirect(`/urls/${newRandom}`);
