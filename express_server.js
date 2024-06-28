@@ -18,6 +18,7 @@ function generateRandomString() {
     return result;
 }
 
+//verify if email exist in users
 function getUserByEmail(account) {
   for (let userId in users) {
     if (users[userId].email === account) {
@@ -124,8 +125,10 @@ app.post('/login', (req, res) => {
   const email = req.body.email.trim()
   const password = req.body.password.trim()
   const profile = getUserByEmail(email)
+  //if email or password empty
   if (email === "" || password === "") {
     res.status(400).send('Email and Password can not be empty');
+    //if email does not exist
   } else if (profile === null) {
     res.status(403).send('Email cannot be found');
   } else {
@@ -144,8 +147,10 @@ app.post("/register", (req, res) => {
   const newRandom = generateRandomString();
   const email = req.body.email.trim()
   const password = req.body.password.trim()
+  //if email or password empty
   if (email === "" || password === "") {
     res.status(400).send('Email and Password can not be empty');
+    //if email exist already
   } else if (getUserByEmail(email) !== null) {
     res.status(400).send('This email us currently used');
   } else {
