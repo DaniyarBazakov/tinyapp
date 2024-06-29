@@ -17,13 +17,14 @@ const getUrlById = function(urlID, obj) {
   return null; 
 }
 
-const urlsForUser = function(userID, obj) {
+const urlsForUser = function(user_ID, obj) {
   const userUrls = {};
-  for (const key in obj) {
-    if (obj[key].userID === userID) {
+  for (let key in obj) {
+    if (obj[key]["userID"] === user_ID) {
       userUrls[key] = obj[key];
     }
   }
+  console.log(userUrls)
   return userUrls;
 }
 
