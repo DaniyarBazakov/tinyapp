@@ -24,7 +24,6 @@ const urlsForUser = function(user_ID, obj) {
       userUrls[key] = obj[key];
     }
   }
-  console.log(userUrls)
   return userUrls;
 }
 
