@@ -1,4 +1,4 @@
-const { getUserByEmail, getUrlById, urlsForUser } = require("./helpers");
+const { getUserByEmail, getUrlById, urlsForUser, generateRandomString } = require("./helpers");
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session')
@@ -46,17 +46,6 @@ const users = {
     password: "dishwasher-funk",
   },
 };
-
-//FUNCTIONS
-function generateRandomString() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < 6; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        result += characters[randomIndex];
-    }
-    return result;
-}
 
 //Login
 app.get("/login", (req, res) => {
