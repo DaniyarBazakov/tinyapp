@@ -124,6 +124,15 @@ app.post("/register", (req, res) => {
   }
 });
 
+//GET /
+app.get("/", (req, res) => {
+  const {user_id} = req.session
+  if (!users[user_id]) {
+    return res.redirect(`/login`);
+  }
+  res.redirect(`/urls`);
+});
+
 ///URLS
 app.get("/urls", (req, res) => {
   const {user_id} = req.session
@@ -138,7 +147,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const {user_id} = req.session
   if (!users[user_id]) {
-    return res.send('Please Login In');
+    return res.redirect(`/login`);
   }
   const templateVars = { user: users[user_id]};
   res.render("urls_new", templateVars);
